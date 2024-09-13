@@ -6,6 +6,7 @@ import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import Listing from "./components/Listing";
 import AddListing from "./components/AddListing";
+import SignUp from "./components/SignUp";
 import { useEffect, useState } from "react";
 import SearchPage from "./components/searchPage";
 
@@ -22,6 +23,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<SignUp />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/search" element={<SearchPage />} />
       <Route path="/listing/:id" element={<Listing />} />

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Form, FormGroup, Label, Input, Button, Container } from "reactstrap";
 import Navigation from "./Navigation";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const AddListing = (props) => {
   const [title, setTitle] = useState("");
@@ -16,7 +17,42 @@ const AddListing = (props) => {
       return alert("Please enter all required fields");
     }
     console.log("Form submitted:", { title, description, price });
-    return navigate("/dashboard");
+    const { customer_id } = localStorage.getItem("open-backline-customer_id");
+    const form_data = { title, description, price, customer_id };
+    axios
+      .post(
+        "http://127.0.0.1:5000/customer/add_listing",
+        {
+          input_data: form_data,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(
+              "open-backline-token"
+            )}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response.data);
+
+        //redirect user to dashboard page once the it's a success
+        if (response.status === 201) {
+          // return and navigate to the dashboard route with props
+          const propsToPass = {
+            loggedIn: true,
+            customer_id: response.data.customer_id,
+          };
+          // Need to add customer ID props
+          console.log("propsToPass: ", propsToPass);
+          navigate("/dashboard", { state: propsToPass });
+        }
+      })
+      .catch((err) => {
+        if (err.response.status === 401) {
+          alert("An error occured");
+        }
+      });
   };
 
   return (

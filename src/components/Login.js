@@ -13,33 +13,42 @@ function Login(props) {
       email: e.target.email.value,
       password: e.target.password.value,
     };
-    const propsToPass = { loggedIn: true };
-    return navigate("/dashboard", { state: propsToPass });
-    // comment out until backend is more developed
-    // axios
-    //   .post("http://127.0.0.1:5000/login", loginPayload)
-    //   .then((response) => {
-    //     //get token from response
-    //     const token = response.data.access_token;
 
-    //     //set JWT token to local
-    //     localStorage.setItem("open-backline-token", token);
+    axios
+      .post("http://127.0.0.1:5000/login", loginPayload)
+      .then((response) => {
+        //get token from response
+        const token = response.data.access_token;
+        console.log(response.data);
+        //set JWT token to local
+        localStorage.setItem("open-backline-token", token);
+        localStorage.setItem(
+          "open-backline-customer_id",
+          response.data.customer_id
+        );
 
-    //     //set token to axios common header
-    //     // setAuthToken(token);
-    //     const propsToPass = { loggedIn: true };
-    //     //redirect user to dashboard page
-    //     if (response.status === 200) {
-    //       // return and navigate to the dashboard route with props
+        //set token to axios common header
+        // setAuthToken(token);
 
-    //       return navigate("/dashboard", { state: propsToPass });
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     if (err.response.status === 401) {
-    //       alert("Login failed. Please enter correct username and password");
-    //     }
-    //   });
+        //redirect user to dashboard page
+        if (response.status === 200) {
+          // return and navigate to the dashboard route with props
+          const propsToPass = {
+            loggedIn: true,
+            customer_id: response.data.customer_id,
+          };
+          // Need to add customer ID props
+          console.log("propsToPass: ", propsToPass);
+          navigate("/dashboard", { state: propsToPass });
+        }
+      })
+      .catch((err) => {
+        if (err.response.status === 401) {
+          alert(
+            "Login failed. Please enter correct username and password or sign up"
+          );
+        }
+      });
   };
   return (
     <div className="login">

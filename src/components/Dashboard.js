@@ -2,16 +2,33 @@ import React, { useEffect, useState } from "react";
 import Navigation from "./Navigation";
 import ListingCard from "./ListingCard";
 import { Container, Row, Col, Button } from "reactstrap";
-import { useNavigate } from "react-router-dom";
-import checkAuth from "../functionLibrary";
-import mockData from "../mockData";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function Dashboard(props) {
-  const [userListings, setUserListings] = useState(mockData.userListings);
+  console.log("props in Dashboard", props);
+  const [userListings, setUserListings] = useState([]);
+  const { state } = useLocation();
+  // const { customer_id } = localStorage.getItem("open-backline-customer_id");
   const navigate = useNavigate();
   console.log(userListings);
   useEffect(() => {
-    console.log(props.loggedIn);
+    console.log("props in Dash useeffect", props);
+    axios
+      .get(`http://127.0.0.1:5000/customer/get_listings`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(
+            "open-backline-token"
+          )}`,
+        },
+      })
+      .then((response) => {
+        setUserListings(response.data.listings);
+      })
+      .catch((err) => {
+        console.log(err);
+        return navigate("/login");
+      });
   }, []);
   function redirectToAddListing() {
     return navigate("/new_listing");
@@ -28,7 +45,7 @@ function Dashboard(props) {
           </Button>
         </Col>
       </Row>
-      <h1>Watched items:</h1>
+      <h1>Your listings:</h1>
       <Container>
         <Row>
           {userListings.map((listing) => {
@@ -36,7 +53,7 @@ function Dashboard(props) {
             return (
               <Col>
                 <ListingCard
-                  id={listing.id}
+                  key={listing.id}
                   image={listing.imageUrl}
                   title={listing.title}
                   description={listing.description}
